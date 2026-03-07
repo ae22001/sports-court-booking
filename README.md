@@ -3,5 +3,6 @@ Gestion y reserva de canchas
 
 ## Integrantes
 Rodrigo Aguilar - AE22001
-Katherine Tatiana Hernández Hernández - HH20017
-Samuel Timoteo Cortez Hernandez   - CH21024
+<br/>Samuel Timoteo Cortez Hernandez   - CH21024
+<br/>Daniel Contreras - CR11019
+<br/>Katherine Tatiana Hernandez Hernandez - HH20017
