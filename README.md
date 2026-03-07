@@ -1,3 +1,4 @@
+
 # sports-court-booking
 Gestion y reserva de canchas
 
@@ -6,3 +7,5 @@ Rodrigo Aguilar - AE22001
 <br/>Samuel Timoteo Cortez Hernandez   - CH21024
 <br/>Daniel Contreras - CR11019
 <br/>Katherine Tatiana Hernandez Hernandez - HH20017
+<br/>Josue Alexander Najarro Cardoza - NC23009  
+
