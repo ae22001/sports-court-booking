@@ -1,13 +1,15 @@
 package com.sportbooking.controller;
+
 import com.sportbooking.dto.CourtDTO;
 import com.sportbooking.model.Court;
 import com.sportbooking.service.CourtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -18,26 +20,26 @@ public class CourtController {
     @Autowired
     private CourtService courtService;
 
-    @Operation(summary = "Listar canchas", description = "Retorna todas las canchas registradas en el sistema.")
+    @Operation(summary = "Listar canchas")
     @GetMapping
-    public List<Court> getAll() {
-        // Implementación...
-        return courtService.findAll();
+    public ResponseEntity<List<Court>> getAll() {
+        return ResponseEntity.ok(courtService.findAll());
     }
 
-    @Operation(summary = "Crear cancha", description = "Registra una nueva cancha recibiendo un DTO.")
+    @Operation(summary = "Crear cancha")
     @PostMapping
     public ResponseEntity<Court> create(@RequestBody CourtDTO courtDTO) {
-        return ResponseEntity.ok(courtService.saveCourt(courtDTO));
+        Court savedCourt = courtService.saveCourt(courtDTO);
+        return new ResponseEntity<>(savedCourt, HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Actualizar cancha", description = "Modifica los datos de una cancha existente mediante su ID.")
+    @Operation(summary = "Actualizar cancha")
     @PutMapping("/{id}")
     public ResponseEntity<Court> update(@PathVariable Long id, @RequestBody CourtDTO courtDTO) {
         return ResponseEntity.ok(courtService.updateCourt(id, courtDTO));
     }
 
-    @Operation(summary = "Eliminar cancha", description = "Borra físicamente el registro de una cancha de la base de datos.")
+    @Operation(summary = "Eliminar cancha")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         courtService.deleteCourt(id);
