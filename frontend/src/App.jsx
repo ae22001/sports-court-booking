@@ -176,7 +176,7 @@ function App() {
         {/* SECCIÓN LISTADO */}
         <section className="list-section">
           <div className="section-header">
-            <h2>Listado de Reservas</h2>
+            <h2>Listado de Canchas</h2>
             <span className="counter">{mockCourts.length} registro(s) cargado(s)</span>
           </div>
 
