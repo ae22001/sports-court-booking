@@ -1,7 +1,9 @@
 package com.sportbooking.model;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties; // <-- Revisa que se importe esto
 
 @Entity
 @Table(name = "bookings")
@@ -16,5 +18,11 @@ public class Booking {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"bookings", "password"}) // <-- Corta el bucle con usuario y protege la clave
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "court_id", nullable = false)
+    @JsonIgnoreProperties("bookings") // <-- Corta el bucle con canchas
+    private Court court;
 }
