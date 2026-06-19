@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/courts")
 @Tag(name = "Canchas", description = "Operaciones CRUD para la gestión de infraestructura deportiva")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost"}, methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 public class CourtController {
 
     @Autowired

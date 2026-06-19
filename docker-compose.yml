@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # 1. Servicio Backend (Java / Spring Boot)
+  backend:
+    build: ./backend/sports-court-api/sports-court-api
+    container_name: app_backend
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+    # coneccion a la base de datos local
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/canchas_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=ch21024
+    networks:
+      - app_network
+
+  #  Servicio Frontend (React / Nginx)
+  frontend:
+    build: ./frontend
+    container_name: app_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge

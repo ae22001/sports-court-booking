@@ -1,259 +1,401 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'react-dom';
+import axiosInstance from 'axios';
+
+const BOOKINGS_URL = 'http://localhost:8081/api/v1/bookings';
+const COURTS_URL = 'http://localhost:8081/api/v1/courts';
 
 function App() {
-  // 1. Mock Data Inicial (Simulación de GET)
-  const [mockCourts, setMockCourts] = useState([
-    { id: 1, name: "Estadio Cuscatlán (Auxiliar)", type: "Grama Natural", pricePerHour: 45.00 },
-    { id: 2, name: "Fusalmo Central", type: "Grama Sintética", pricePerHour: 25.00 },
-    { id: 3, name: "Gimnasio Nacional - Duela", type: "Duela (Tabloncillo)", pricePerHour: 35.00 }
-  ]);
+  const [bookings, setBookings] = useState([]);
+  const [courts, setCourts] = useState([]);
 
-  // Estados para controlar los campos del formulario
+  // Inputs Formulario Reserva (Soporta Creación y Edición)
+  const [bookingIdToEdit, setBookingIdToEdit] = useState(null);
+  const [isEditingBooking, setIsEditingBooking] = useState(false);
   const [courtId, setCourtId] = useState('');
-  const [name, setName] = useState('');
-  const [type, setType] = useState('Grama Sintética');
-  const [pricePerHour, setPricePerHour] = useState('');
+  const [date, setDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
 
-  // Estado para saber si estamos editando (Modo PUT) o creando (Modo POST)
-  const [isEditing, setIsEditing] = useState(false);
+  // Inputs Formulario Cancha
+  const [courtIdToEdit, setCourtIdToEdit] = useState(null);
+  const [courtName, setCourtName] = useState('');
+  const [courtType, setCourtType] = useState('Grama Sintética');
+  const [courtPrice, setCourtPrice] = useState('');
+  const [isEditingCourt, setIsEditingCourt] = useState(false);
 
-  // 2. Operación: CREAR o EDITAR (Simulación POST / PUT)
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
+  // Alertas e Indicadores de Éxito
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [courtSuccess, setCourtSuccess] = useState('');
 
-    const priceParsed = parseFloat(pricePerHour);
-
-    if (isEditing) {
-      // Simulación PUT
-      setMockCourts(mockCourts.map(court => 
-        court.id === parseInt(courtId) 
-          ? { id: parseInt(courtId), name, type, pricePerHour: priceParsed } 
-          : court
-      ));
-      alert(`[Simulación PUT] Registro con ID ${courtId} modificado exitosamente.`);
-    } else {
-      // Simulación POST
-      const newId = mockCourts.length > 0 ? Math.max(...mockCourts.map(c => c.id)) + 1 : 1;
-      const newCourt = { id: newId, name, type, pricePerHour: priceParsed };
-      setMockCourts([...mockCourts, newCourt]);
-      alert(`[Simulación POST] Nueva cancha registrada con ID asignado: ${newId}.`);
+  const loadData = async () => {
+    try {
+      const responseBookings = await axiosInstance.get(BOOKINGS_URL);
+      if (responseBookings && Array.isArray(responseBookings.data)) {
+        setBookings(responseBookings.data);
+      } else {
+        setBookings([]);
+      }
+    } catch (err) {
+      setBookings([]);
     }
 
-    resetForm();
+    try {
+      const responseCourts = await axiosInstance.get(COURTS_URL);
+      if (responseCourts && Array.isArray(responseCourts.data)) {
+        setCourts(responseCourts.data);
+      } else {
+        setCourts([]);
+      }
+    } catch (err) {
+      setCourts([]);
+    }
   };
 
-  // 3. Preparar Interfaz para Edición (Cambio visual a modo PUT)
-  const prepareEdit = (court) => {
-    setCourtId(court.id);
-    setName(court.name);
-    setType(court.type);
-    setPricePerHour(court.pricePerHour);
-    setIsEditing(true);
+  useEffect(() => {
+    loadData();
+  }, []);
 
-    // Scroll suave hacia el formulario en pantallas móviles
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleCourtSubmit = async (e) => {
+    e.preventDefault();
+    setError(''); setSuccess(''); setCourtSuccess('');
+
+    const courtPayload = {
+      name: courtName,
+      type: courtType,
+      pricePerHour: parseFloat(courtPrice),
+      isAvailable: true
+    };
+
+    try {
+      if (isEditingCourt) {
+        await axiosInstance.put(`${COURTS_URL}/${courtIdToEdit}`, courtPayload);
+        setCourtSuccess(`¡Cancha actualizada con éxito!`);
+        cancelCourtEdit();
+      } else {
+        await axiosInstance.post(COURTS_URL, courtPayload);
+        setCourtSuccess(`¡Cancha "${courtName}" guardada con éxito!`);
+        setCourtName(''); setCourtPrice('');
+      }
+      loadData();
+    } catch (err) {
+      setError('Error al procesar la operación en la tabla de canchas.');
+    }
   };
 
-  // 4. Operación: ELIMINAR
-  const deleteItem = (id) => {
-    if (window.confirm(`¿Estás seguro de que deseas simular el DELETE para el registro #${id}?`)) {
-      setMockCourts(mockCourts.filter(court => court.id !== id));
-      alert(`[Simulación DELETE] Registro #${id} removido.`);
-      
-      // Si estábamos editando la cancha que se eliminó, limpiamos el formulario
-      if (courtId === id) {
-        resetForm();
+  const handleEditCourtClick = (court) => {
+    setCourtIdToEdit(court.id);
+    setCourtName(court.name);
+    setCourtType(court.type || 'Grama Sintética');
+    setCourtPrice(court.pricePerHour);
+    setIsEditingCourt(true);
+  };
+
+  const cancelCourtEdit = () => {
+    setCourtIdToEdit(null);
+    setCourtName('');
+    setCourtPrice('');
+    setIsEditingCourt(false);
+  };
+
+  const handleDeleteCourt = async (id) => {
+    if (window.confirm('¿Seguro que deseas eliminar esta cancha?')) {
+      try {
+        await axiosInstance.delete(`${COURTS_URL}/${id}`);
+        setCourtSuccess('Cancha eliminada correctamente.');
+        loadData();
+      } catch (err) {
+        setError('No se puede borrar la cancha debido a restricciones de integridad en la base de datos.');
       }
     }
   };
 
-  // Limpiar el estado del formulario
-  const resetForm = () => {
-    setCourtId('');
-    setName('');
-    setType('Grama Sintética');
-    setPricePerHour('');
-    setIsEditing(false);
+  const handleBookingSubmit = async (e) => {
+    e.preventDefault();
+    setError(''); setSuccess(''); setCourtSuccess('');
+
+    if (!courtId) {
+      setError('Por favor, selecciona una cancha válida.');
+      return;
+    }
+
+    const formattedStart = `${date}T${startTime}:00`;
+    const formattedEnd = `${date}T${endTime}:00`;
+
+    const bookingPayload = {
+      userId: 1,
+      courtId: parseInt(courtId),
+      startTime: formattedStart,
+      endTime: formattedEnd
+    };
+
+    try {
+      if (isEditingBooking) {
+        await axiosInstance.put(`${BOOKINGS_URL}/${bookingIdToEdit}`, bookingPayload);
+        setSuccess('¡Reserva modificada y actualizada con éxito!');
+        cancelBookingEdit();
+      } else {
+        await axiosInstance.post(BOOKINGS_URL, bookingPayload);
+        setSuccess('¡Reserva registrada con éxito!');
+        setCourtId(''); setDate(''); setStartTime(''); setEndTime('');
+      }
+      loadData();
+    } catch (err) {
+      setError(err.response?.data || 'La cancha elegida ya se encuentra ocupada en ese rango horario.');
+    }
+  };
+
+  const handleEditBookingClick = (booking) => {
+    setError(''); setSuccess('');
+    setBookingIdToEdit(booking.id);
+    setCourtId(booking.court?.id || booking.courtId || '');
+
+    if (booking.startTime) {
+      const parts = booking.startTime.split('T');
+      setDate(parts[0]);
+      if (parts[1]) setStartTime(parts[1].substring(0, 5));
+    }
+    if (booking.endTime && booking.endTime.includes('T')) {
+      setEndTime(booking.endTime.split('T')[1].substring(0, 5));
+    }
+
+    setIsEditingBooking(true);
+  };
+
+  const cancelBookingEdit = () => {
+    setBookingIdToEdit(null);
+    setCourtId(''); setDate(''); setStartTime(''); setEndTime('');
+    setIsEditingBooking(false);
+  };
+
+  const handleCancelBooking = async (id) => {
+    if (window.confirm('¿Seguro que deseas cancelar permanentemente esta reserva?')) {
+      try {
+        await axiosInstance.delete(`${BOOKINGS_URL}/${id}`);
+        setSuccess('Reserva cancelada y removida con éxito.');
+        loadData();
+        if (isEditingBooking && bookingIdToEdit === id) cancelBookingEdit();
+      } catch (err) {
+        setError('No se pudo dar de baja el turno.');
+      }
+    }
+  };
+
+  const formatFecha = (fechaString) => {
+    if (!fechaString) return '';
+    try {
+      return new Date(fechaString).toLocaleString('es-SV', { dateStyle: 'short', timeStyle: 'short' });
+    } catch (e) {
+      return fechaString;
+    }
   };
 
   return (
-    <div className="app-wrapper">
-      {/* CABECERA */}
-     <header className="main-header">
-  <div className="header-container">
-    <h1 className="logo">
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        viewBox="0 0 100 60" 
-        style={{ width: '65px', height: '45px', fill: 'none', stroke: '#ffffff', strokeWidth: '2.5', strokeLinejoin: 'round' }}
-      >
-        {/* Postes y red trasera de la portería */}
-        <rect x="10" y="10" width="80" height="45" rx="2" />
-        <path d="M 10 10 L 25 25 L 75 25 L 90 10" strokeWidth="1.5" strokeDasharray="3,3" />
-        <path d="M 25 25 L 25 55 M 75 25 L 75 55" strokeWidth="1.5" strokeDasharray="3,3" />
-        {/* Red cuadriculada */}
-        <path d="M 20 10 L 20 55 M 30 10 L 30 55 M 40 10 L 40 55 M 50 10 L 50 55 M 60 10 L 60 55 M 70 10 L 70 55 M 80 10 L 80 55" strokeWidth="1" opacity="0.4" />
-        <path d="M 10 20 L 90 20 M 10 30 L 90 30 M 10 40 L 90 40 M 10 50 L 90 50" strokeWidth="1" opacity="0.4" />
-        {/* Balón de fútbol en el ángulo inferior izquierdo */}
-        <circle cx="28" cy="43" r="7" fill="#ffffff" stroke="#15803d" strokeWidth="1.5" />
-        <circle cx="28" cy="43" r="2" fill="#15803d" />
-        <path d="M 28 41 L 28 36 M 28 45 L 28 50 M 26 43 L 21 43 M 30 43 L 35 43" stroke="#15803d" strokeWidth="1" />
-      </svg>
-      
-      {/* Texto estructurado en dos líneas */}
-      <div className="logo-text">
-        <span>Sports</span>
-        <span style={{ fontWeight: '400', opacity: '0.95' }}>court Booking</span>
-      </div>
-    </h1>
-    
-  </div>
-</header>
-
-      {/* CONTENEDOR PRINCIPAL */}
-      <main className="main-content">
-        
-        {/* SECCIÓN FORMULARIO */}
-        <section className="form-section">
-          <div className="section-header">
-            <h2>{isEditing ? "Modificar Cancha" : "Registrar Nueva Cancha"}</h2>
-            
-        
+      <div className="app-wrapper">
+        <header className="main-header">
+          <div className="header-container">
+            <div className="logo">
+              <div className="logo-text">
+                <span>SPORTS COURT BOOKING</span>
+                <small style={{ fontSize: '0.9rem', fontWeight: '400', opacity: 0.9 }}>
+                  Sistema de reservas de canchas
+                </small>
+              </div>
+            </div>
           </div>
+        </header>
 
-          <form onSubmit={handleFormSubmit}>
-            <div className="form-group">
-              <label htmlFor="court-name">Nombre de la Cancha</label>
-              <input 
-                type="text" 
-                id="court-name" 
-                required 
-                placeholder="Ej: Cancha Central Los Próceres"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
+        <main className="main-content">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-            <div className="form-group">
-              <label htmlFor="court-type">Tipo de Superficie</label>
-              <select 
-                id="court-type"
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-              >
-                <option value="Grama Sintética">Grama Sintética</option>
-                <option value="Grama Natural">Grama Natural</option>
-                <option value="Cemento">Cemento</option>
-              </select>
-            </div>
+            {/* TABLA DE GESTIÓN DE CANCHAS */}
+            <section className="form-section">
+              <div className="section-header">
+                <h2>{isEditingCourt ? 'Modificar Cancha' : '1. Registrar Cancha'}</h2>
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="court-price">Precio por Hora ($)</label>
-              <input 
-                type="number" 
-                step="0.01" 
-                id="court-price" 
-                required 
-                placeholder="0.00"
-                value={pricePerHour}
-                onChange={(e) => setPricePerHour(e.target.value)}
-              />
-            </div>
-
-            <div className="form-actions">
-              <button type="submit" className={`btn ${isEditing ? 'btn-warning' : 'btn-primary'}`}>
-                {isEditing ? "Actualizar Registro" : "Guardar Registro"}
-              </button>
-              {isEditing && (
-                <button type="button" className="btn btn-secondary" onClick={resetForm}>
-                  Cancelar Edición
-                </button>
-              )}
-            </div>
-          </form>
-        </section>
-
-        {/* SECCIÓN LISTADO */}
-        <section className="list-section">
-          <div className="section-header">
-            <h2>Listado de Canchas</h2>
-            <span className="counter">{mockCourts.length} registro(s) cargado(s)</span>
-          </div>
-
-          {/* Estado vacío simulado */}
-          {mockCourts.length === 0 ? (
-            <div className="empty-state">
-              <p className="empty-icon">📋</p>
-              <p>No hay canchas registradas.</p>
-            </div>
-          ) : (
-            <>
-              {/* VISTA MOBILE: Tarjetas apiladas (Controlado por CSS) */}
-              <div className="cards-grid">
-                {mockCourts.map(court => (
-                  <div className="court-card" key={court.id}>
-                    <div className="card-body">
-                      <div className="card-header-row">
-                        <h3>{court.name}</h3>
-                        <span className="card-id">ID: {court.id}</span>
-                      </div>
-                      <p className="card-text"><strong>Superficie:</strong> {court.type}</p>
-                      <p className="card-price">${court.pricePerHour.toFixed(2)} / hr</p>
-                    </div>
-                    <div className="card-actions">
-                      <button onClick={() => prepareEdit(court)} className="btn-action edit-action">
-                        Editar 
-                      </button>
-                      <button onClick={() => deleteItem(court.id)} className="btn-action delete-action">
-                        Eliminar 
-                      </button>
-                    </div>
+              {courtSuccess && (
+                  <div style={{ backgroundColor: '#ffffff', color: '#166534', padding: '0.65rem', borderRadius: '0.5rem', marginBottom: '1rem', fontSize: '0.85rem', fontWeight: '600' }}>
+                    ⚽ {courtSuccess}
                   </div>
-                ))}
+              )}
+
+              <form onSubmit={handleCourtSubmit}>
+                <div className="form-group">
+                  <label>Nombre del Escenario</label>
+                  <input type="text" placeholder="Ej: Cancha de Tenis" value={courtName} onChange={(e) => setCourtName(e.target.value)} required />
+                </div>
+                <div className="form-group">
+                  <label>Tipo de Superficie</label>
+                  <select value={courtType} onChange={(e) => setCourtType(e.target.value)} required>
+                    <option value="Grama Sintética">Grama Sintética</option>
+                    <option value="Básquetbol / Concreto">Básquetbol / Concreto</option>
+                    <option value="Fútsal Rápido">Fútsal Rápido</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Precio por Hora ($)</label>
+                  <input type="number" step="0.01" placeholder="30.00" value={courtPrice} onChange={(e) => setCourtPrice(e.target.value)} required />
+                </div>
+                <div className="form-actions">
+                  <button type="submit" className="btn btn-warning" style={{ fontWeight: '700' }}>
+                    {isEditingCourt ? 'Actualizar Cancha' : 'Guardar Cancha'}
+                  </button>
+                  {isEditingCourt && (
+                      <button type="button" className="btn btn-secondary" onClick={cancelCourtEdit}>
+                        Cancelar
+                      </button>
+                  )}
+                </div>
+              </form>
+
+              <div style={{ marginTop: '1.5rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#ffffff', display: 'block', marginBottom: '0.5rem' }}>Canchas Disponibles en el Sistema</label>
+                {courts.length === 0 ? <small className="text-muted">No existen escenarios creados.</small> : (
+                    <ul style={{ listStyle: 'none', padding: 0 }}>
+                      {courts.map(c => (
+                          <li key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.4rem 0', fontSize: '0.85rem', borderBottom: '1px dashed #eee' }}>
+                            <span><strong>{c.name}</strong> ({c.type} - ${c.pricePerHour}/hr)</span>
+                            <div>
+                              <button onClick={() => handleEditCourtClick(c)} style={{ backgroundColor: 'transparent', color: '#2563eb', border: 'none', cursor: 'pointer', fontWeight: 'bold', marginRight: '0.5rem' }}>Editar</button>
+                              <button onClick={() => handleDeleteCourt(c.id)} style={{ backgroundColor: 'transparent', color: '#dc2626', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>Borrar</button>
+                            </div>
+                          </li>
+                      ))}
+                    </ul>
+                )}
+              </div>
+            </section>
+
+            {/* FORMULARIO DE RESERVA DE TURNOS (CREAR / EDITAR) */}
+            <section className="form-section">
+              <div className="section-header">
+                <h2>{isEditingBooking ? 'Modificar Turno Seleccionado' : '2. Reservar Turno'}</h2>
               </div>
 
-              {/* VISTA DESKTOP: Tabla estructurada (Controlado por CSS) */}
-              <div className="table-container">
-                <table className="responsive-table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Nombre</th>
-                      <th>Superficie</th>
-                      <th>Precio / Hora</th>
-                      <th className="text-right">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {mockCourts.map(court => (
-                      <tr key={court.id}>
-                        <td className="cell-id">#{court.id}</td>
-                        <td className="cell-name">{court.name}</td>
-                        <td>{court.type}</td>
-                        <td className="cell-price">${court.pricePerHour.toFixed(2)}</td>
-                        <td className="cell-actions">
-                          <button onClick={() => prepareEdit(court)} className="table-btn table-btn-edit">
-                            Editar
-                          </button>
-                          <button onClick={() => deleteItem(court.id)} className="table-btn table-btn-delete">
-                            Eliminar 
-                          </button>
-                        </td>
-                      </tr>
+              {error && (
+                  <div style={{ backgroundColor: '#fee2e2', color: '#991b1b', padding: '0.65rem', borderRadius: '0.5rem', marginBottom: '1rem', fontSize: '0.85rem', fontWeight: '600' }}>
+                    ⚠️ {error}
+                  </div>
+              )}
+              {success && (
+                  <div style={{ backgroundColor: '#dcfce7', color: '#166534', padding: '0.65rem', borderRadius: '0.5rem', marginBottom: '1rem', fontSize: '0.85rem', fontWeight: '600' }}>
+                    ✅ {success}
+                  </div>
+              )}
+
+              <form onSubmit={handleBookingSubmit}>
+                <div className="form-group">
+                  <label>Seleccionar Cancha</label>
+                  <select value={courtId} onChange={(e) => setCourtId(e.target.value)} required>
+                    <option value="">-- Selecciona --</option>
+                    {courts.map(court => (
+                        <option key={court.id} value={court.id}>{court.name} (${court.pricePerHour}/hr)</option>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          )}
-        </section>
-      </main>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Fecha</label>
+                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="form-group">
+                    <label>Hora Inicio</label>
+                    <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Hora Fin</label>
+                    <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
+                  </div>
+                </div>
+                <div className="form-actions" style={{ marginTop: '0.5rem' }}>
+                  <button type="submit" className={`btn ${isEditingBooking ? 'btn-warning' : 'btn-primary'}`} style={{ width: '100%', fontWeight: '700' }}>
+                    {isEditingBooking ? '💾 Actualizar Cambios del Alquiler' : 'Agendar Nueva Reserva'}
+                  </button>
+                  {isEditingBooking && (
+                      <button type="button" className="btn btn-secondary" style={{ width: '100%' }} onClick={cancelBookingEdit}>
+                        Cancelar Edición
+                      </button>
+                  )}
+                </div>
+              </form>
+            </section>
+          </div>
 
-      {/* FOOTER */}
-      <footer className="main-footer">
-        Cancha SV Prototipo • Cumplimiento de Requerimientos de Interfaz (React)
-      </footer>
-    </div>
+          {/* HISTORIAL GENERAL DE RESERVAS */}
+          <section className="list-section">
+            <div className="section-header">
+              <h2>Historial General de Reservas</h2>
+              <span className="counter">Total: {bookings.length}</span>
+            </div>
+
+            {bookings.length === 0 ? (
+                <div className="empty-state">
+                  <div className="empty-icon">⚽</div>
+                  <p>No se registran turnos agendados en la base de datos.</p>
+                </div>
+            ) : (
+                <>
+                  {/* RESPONSIVE CARDS (MOBILE) */}
+                  <div className="cards-grid">
+                    {bookings.map(b => (
+                        <div key={b.id} className="court-card">
+                          <div className="card-header-row">
+                            <h3>
+                              {b.court?.name || courts.find(c => c.id === b.courtId)?.name || `Escenario (ID: ${b.courtId})`}
+                            </h3>
+                            <span className="card-id">#{b.id}</span>
+                          </div>
+                          <div className="card-text"><strong>Inicio:</strong> {formatFecha(b.startTime)}</div>
+                          <div className="card-text"><strong>Fin:</strong> {formatFecha(b.endTime)}</div>
+                          <div className="card-actions" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.75rem' }}>
+                            <button className="btn-action edit-action" style={{ backgroundColor: '#2563eb', color: '#0b0000', border: 'none', padding: '0.35rem', borderRadius: '0.25rem', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => handleEditBookingClick(b)}>Editar</button>
+                            <button className="btn-action delete-action" onClick={() => handleCancelBooking(b.id)}>Eliminar</button>
+                          </div>
+                        </div>
+                    ))}
+                  </div>
+
+                  {/* RESPONSIVE TABLE (DESKTOP) */}
+                  <div className="table-container">
+                    <table className="responsive-table">
+                      <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Escenario</th>
+                        <th>Hora Entrada</th>
+                        <th>Hora Salida</th>
+                        <th style={{ textAlign: 'right', paddingRight: '1.5rem' }}>Operación</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {bookings.map(b => (
+                          <tr key={b.id}>
+                            <td className="cell-id">#{b.id}</td>
+                            <td className="cell-name">
+                              {b.court?.name || courts.find(c => c.id === b.courtId)?.name || `Escenario (ID: ${b.courtId})`}
+                            </td>
+                            <td>{formatFecha(b.startTime)}</td>
+                            <td>{formatFecha(b.endTime)}</td>
+                            <td className="cell-actions" style={{ textAlign: 'right' }}>
+                              <button className="table-btn" style={{ backgroundColor: '#2563eb', marginRight: '0.5rem' }} onClick={() => handleEditBookingClick(b)}>
+                                Editar
+                              </button>
+                              <button className="table-btn table-btn-delete" onClick={() => handleCancelBooking(b.id)}>
+                                Eliminar
+                              </button>
+                            </td>
+                          </tr>
+                      ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+            )}
+          </section>
+        </main>
+      </div>
   );
 }
 
