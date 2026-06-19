@@ -20,33 +20,25 @@ body {
 }
 
 /* DISEÑO MOBILE FIRST (Estilos por defecto para celulares)*/
-  
 
-/* Cabecera estilizada con fondo de grama y red de portería */
+
 .main-header {
     color: #ffffff;
-    padding: 2.5rem 1.5rem; 
+    padding: 3.5rem 1.5rem;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    
-    /* 1. Base del color verde grama */
-    background-color: #22c55e; 
-    
-    /* 2. Degradado sutil combinado con el patrón geométrico de la red */
-    background-image: 
-        linear-gradient(135deg, rgba(21, 128, 61, 0.93) 0%, rgba(34, 197, 94, 0.85) 100%),
-        linear-gradient(30deg, #15803d 12%, transparent 12.5%, transparent 87%, #15803d 87.5%, #15803d),
-        linear-gradient(150deg, #15803d 12%, transparent 12.5%, transparent 87%, #15803d 87.5%, #15803d),
-        linear-gradient(30deg, #15803d 12%, transparent 12.5%, transparent 87%, #15803d 87.5%, #15803d),
-        linear-gradient(150deg, #15803d 12%, transparent 12.5%, transparent 87%, #15803d 87.5%, #15803d),
-        linear-gradient(60deg, rgba(21, 128, 61, 0.3) 25%, transparent 25.5%, transparent 75%, rgba(21, 128, 61, 0.3) 75.5%, rgba(21, 128, 61, 0.3)),
-        linear-gradient(60deg, rgba(21, 128, 61, 0.3) 25%, transparent 25.5%, transparent 75%, rgba(21, 128, 61, 0.3) 75.5%, rgba(21, 128, 61, 0.3));
-    
-    /* 3. Tamaño y escala de los rombos de la red */
-    background-size: 100% 100%, 40px 70px, 40px 70px, 40px 70px, 40px 70px, 40px 70px, 40px 70px;
-    background-position: 0 0, 0 0, 0 0, 20px 35px, 20px 35px, 0 0, 20px 35px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+
+    /* 1. Ruta relativa hacia tu carpeta de assets */
+    background-image:
+            linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), /* Filtro oscuro para garantizar legibilidad */
+            url('./assets/foot.jpeg'); /* <-- Usa tu imagen local */
+
+    /* 2. Propiedades de ajuste absoluto */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 /* Ajustes de alineación para los elementos del logo */
@@ -79,7 +71,7 @@ body {
 }
 
 .logo {
-    font-size: 1.25rem;
+    font-size: 2.10rem;
     font-weight: 700;
 }
 
@@ -109,18 +101,27 @@ body {
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
+/* Cabecera de sección modificada con franja verde menta de fondo */
 .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.25rem;
+
+    /* Agregamos el color verde menta de fondo, bordes suaves y relleno */
+    background-color: #03ae25; /* Código HEX para un verde menta pastel muy limpio */
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05); /* Sutil profundidad */
 }
 
+/* Ajuste del título para que resalte sobre el fondo menta */
 .section-header h2 {
     font-size: 1.125rem;
-    color: #374151;
+    color: #060700; /* Un verde esmeralda oscuro para que haga un contraste perfecto y legible */
     font-weight: 700;
 }
+
 
 .mode-tag {
     font-size: 0.75rem;
@@ -133,8 +134,8 @@ body {
 .put-mode { background-color: #fef3c7; color: #92400e; }
 
 .counter {
-    font-size: 0.75rem;
-    color: #9ca3af;
+    font-size: 1.30rem;
+    color: #060700;
 }
 
 .form-group {
