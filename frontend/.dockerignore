@@ -1,0 +1,9 @@
+.git
+.idea
+.vscode
+node_modules
+dist
+fe.txt
+eslint.config.js
+Dockerfile
+docker-compose.yml

@@ -1,0 +1,379 @@
+/* VARIABLES GLOBALES Y RESET */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #f3f4f6;
+    color: #1f2937;
+}
+
+.app-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* DISEÑO MOBILE FIRST (Estilos por defecto para moviles)*/
+
+
+.main-header {
+    color: #ffffff;
+    padding: 3.5rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+
+    /* 1. Ruta relativa hacia la carpeta de assets */
+    background-image:
+            linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), /* Filtro oscuro para garantizar legibilidad */
+            url('./assets/foot.jpeg'); /* <-- Usa tu imagen local */
+
+    /* 2. Propiedades de ajuste absoluto */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Ajustes de alineación para los elementos del logo */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 2rem; 
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+/* Contenedor del texto del logotipo para el salto de línea */
+.logo-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-text span {
+    display: block;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.logo {
+    font-size: 2.10rem;
+    font-weight: 700;
+}
+
+.badge {
+    font-size: 0.75rem;
+    background-color: #1d4ed8;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    border: 1px solid #3b82f6;
+}
+
+.main-content {
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.form-section, .list-section {
+    background-color: #ffffff;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Cabecera de sección modificada con franja verde menta de fondo */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+
+    /* Agregamos el color de fondo, bordes suaves y relleno */
+    background-color: #03ae25;
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05); /* Sutil profundidad */
+}
+
+/* Ajuste del título para que resalte sobre el fondo */
+.section-header h2 {
+    font-size: 1.125rem;
+    color: #060700;
+    font-weight: 700;
+}
+
+
+.mode-tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+}
+
+.post-mode { background-color: #dcfce7; color: #166534; }
+.put-mode { background-color: #fef3c7; color: #92400e; }
+
+.counter {
+    font-size: 1.30rem;
+    color: #060700;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 0.65rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    outline: none;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus, .form-group select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.btn {
+    width: 100%;
+    padding: 0.65rem;
+    border-radius: 0.375rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.btn-primary { background-color: #85bb08; color: white; }
+.btn-primary:hover { background-color: #1d4ed8; }
+.btn-warning { background-color: #6011f4; color: white; }
+.btn-warning:hover { background-color: #3c0de3; }
+.btn-secondary { background-color: #e5e7eb; color: #374151; }
+.btn-secondary:hover { background-color: #d1d5db; }
+
+/* Tarjetas en Móviles */
+.cards-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.court-card {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 0.5rem;
+}
+
+.court-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.card-id {
+    font-size: 0.75rem;
+    background-color: #dbeafe;
+    color: #1e40af;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+}
+
+.card-text {
+    font-size: 0.75rem;
+    color: #4b5563;
+    margin-bottom: 0.25rem;
+}
+
+.card-price {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #2563eb;
+    margin-bottom: 0.75rem;
+}
+
+.card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 0.75rem;
+}
+
+.btn-action {
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    text-align: center;
+    color: #ffffff;
+}
+
+.edit-action { background-color: #1b0bf5; }
+.delete-action { background-color: #e10a0a; }
+
+.table-container {
+    display: none;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 0;
+    color: #9ca3af;
+}
+
+.empty-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.main-footer {
+    background-color: #1f2937;
+    color: #9ca3af;
+    text-align: center;
+    font-size: 0.75rem;
+    padding: 1rem;
+    margin-top: auto;
+}
+
+/*   ADAPTACIÓN RESPONSIVE (Escritorio >= 1024px)*/
+
+@media (min-width: 1024px) {
+    .main-content {
+        grid-template-columns: 1fr 2fr;
+        padding: 1.5rem;
+    }
+
+    .form-section {
+        height: max-content;
+    }
+
+    .cards-grid {
+        display: none;
+    }
+
+    .table-container {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .responsive-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .responsive-table th {
+        background-color: #f9fafb;
+        padding: 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .responsive-table td {
+        padding: 0.75rem;
+        font-size: 0.875rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .responsive-table tr:hover {
+        background-color: #f9fafb;
+    }
+
+    .cell-id { font-family: monospace; color: #9ca3af; }
+    .cell-name { font-weight: 500; color: #111827; }
+    .cell-price { font-weight: 600; color: #2563eb; }
+    .cell-actions { text-align: right; }
+
+    /* BOTONES DE ACCIONES  */
+    .table-btn {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.4rem 0.75rem;
+        border-radius: 0.5rem; 
+        border: none;
+        cursor: pointer;
+        margin-left: 0.35rem;
+        display: inline-block;
+        transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .table-btn:active {
+        transform: scale(0.96);
+    }
+
+    /* Recuadro Editar */
+    .table-btn-edit { 
+        background-color: #fef3c7; 
+        color: #2609b4; 
+    }
+    .table-btn-edit:hover { 
+        background-color: #fde68a; 
+    }
+    
+    /* Recuadro Eliminar  */
+    .table-btn-delete { 
+        background-color: #fee2e2; 
+        color: #b90b0b; 
+    }
+    .table-btn-delete:hover { 
+        background-color: #fecaca; 
+    }
+}
